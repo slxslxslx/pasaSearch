@@ -1,0 +1,15 @@
+/results
+/results-RealScholarQuery
+/results-AutoScholarQ-demo
+results*/
+results-*/
+/transformers
+/data
+/checkpoints
+/z-slx
+**/__pycache__
+**/.ipynb_checkpoints
+api_key.py
+eval_results
+/log-auto/
+/log-real/
