@@ -1,2 +1,6 @@
 nohup: ignoring input
-Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:18<00:56, 18.81s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:37<00:37, 18.93s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:54<00:18, 18.01s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:59<00:00, 12.59s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:59<00:00, 14.75s/it]
+Traceback (most recent call last):
+  File "/home/shaolingxuan/project/PasaSearch/run_web_agent.py", line 44, in <module>
+    with open(args.input_file) as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/data/bamboogle_data.jsonl'

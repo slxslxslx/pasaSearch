@@ -34,9 +34,11 @@ def google_search_web(query: str, num: int = 10) -> list[dict]:
 
     for attempt in range(3):
         try:
-            resp = requests.post(url, headers=headers, data=payload, timeout=10)
+            resp = requests.post(url, headers=headers, data=payload, timeout=10) # <Response [200]>
+            print(f"web_utils.py里面的 GGGGGoogle_search_web里面的 resp：{resp}")
             if resp.status_code == 200:
                 data = resp.json()
+                print(f"web_utils.py里面的 GGGGGoogle_search_web里面的 data：{data}") # web_utils.py里面的 GGGGGoogle_search_web里面的 data：{'searchParameters': {'q': 'president of the United States when Citibank was founded', 'type': 'search', 'num': 10, 'page': 1, 'engine': 'google'}, 'organic': [{'title': 'Citibank - Wikipedia', 'link': 'https://en.wikipedia.org/wiki/Citibank', 'snippet': 'Citibank was founded in 1812 as City Bank of New York, and later became First National City Bank of New York.', 'position': 1}, {'title': 'A new bank born in New York - Citi', 'link': 'https://www.citigroup.com/global/about-us/heritage/1812/new-bank-born-in-new-york', 'snippet': '... U.S. President James Madison applied to set up a new bank. Noting that it ... United States. Enter one Samuel Osgood, elder statesman. He had a plan ...', 'position': 2}, {'title': 'Citigroup - Wikipedia', 'link': 'https://en.wikipedia.org/wiki/Citigroup', 'snippet': 'Citi established the first fully operational U.S. bank branch in Hanoi in 1994. Following the branch opening in Ho Chi Minh City in 1998, ...', 'position': 3}, {'title': 'Citibank: Teetering Since 1812 - TIME', 'link': 'https://time.com/archive/6687482/citibank-teetering-since-1812/', 'snippet': "James Stillman, who became City's president in 1891, combined prudence with great ambition. City Bank cruised through the Panic of 1893, thanks ...", 'date': 'Jan 20, 2009', 'position': 4}, {'title': "The Dramatic Highlights From Citi's 200-Year History", 'link': 'https://www.businessinsider.com/presenting-a-history-of-citi-2012-4', 'snippet': 'In 1891, James Stillman is elected president of the bank and helps lead America onto the world stage. James Stillman. Timeline. Stillman ...', 'date': 'Apr 4, 2012', 'attributes': {'Missing': 'founded | Show results with:founded'}, 'position': 5}, {'title': '[PDF] Citi Historic Records Review Summary The history of Citigroup Inc ...', 'link': 'https://www.citigroup.com/rcs/citigpa/storage/public/Citi%20Historic%20Records%20Review%20Summary.pdf', 'snippet': 'Between 1837 and 1882, Moses Taylor was a director, controlling shareholder, and. President (1856-1882) of City Bank of New York. Taylor was also a director of ...', 'position': 6}, {'title': "What is Brief History of Citi Company? - Porter's Five Forces", 'link': 'https://portersfiveforce.com/blogs/brief-history/citigroup', 'snippet': 'Chartered on June 16, 1812; operations began September 14, 1812 · First president: Samuel Osgood, former U.S. Postmaster General and ...', 'date': 'Nov 10, 2025', 'attributes': {'Missing': 'United States'}, 'position': 7}, {'title': 'Citigroup Profile | Street Of Walls', 'link': 'https://www.streetofwalls.com/articles/investment-banking/learn-the-basics/citigroup/', 'snippet': 'Beginning as the City Bank of New York, and later being renamed to Citibank in 1812, it became Bank Handlowy in 1870, Smith Barney in 1873, Banamex in 1884, ...', 'position': 8}, {'title': "From 1812 Origins to One of America's Largest Banks - YouTube", 'link': 'https://www.youtube.com/watch?v=ah0V2gCDa80', 'snippet': 'How did Citibank grow from a small bank founded in 1812 in New York City into one of the largest financial institutions in the United States ...', 'date': 'Mar 8, 2026', 'attributes': {'Missing': 'president | Show results with:president'}, 'position': 9}, {'title': 'Who Owns Citi Company? - PESTEL Analysis', 'link': 'https://pestel-analysis.com/blogs/owners/citigroup', 'snippet': 'Founding (1812), City Bank of New York chartered by New York merchants with Samuel Osgood as first President. Initial capital: $2 million. ; Post ...', 'date': 'Sep 30, 2025', 'attributes': {'Missing': 'United | Show results with:United'}, 'position': 10}], 'peopleAlsoAsk': [{'question': 'Who was the first president of Citi?', 'snippet': "Since the bank's founding in 1812, it has been led by a President, with Samuel Osgood being elected as the first President.", 'title': 'Citibank - Wikipedia', 'link': 'https://en.wikipedia.org/wiki/Citibank'}], 'relatedSearches': [{'query': 'Citibank login'}, {'query': 'Citibank international branches'}, {'query': 'Citibank origin country'}, {'query': 'Citibank CEO'}, {'query': 'Citibank Bangladesh'}, {'query': 'Citi bank India'}, {'query': 'Citibank headquarters'}, {'query': 'Citi Bank customer service'}], 'credits': 1}
                 results = []
                 for item in data.get("organic", []):
                     results.append({
@@ -72,15 +74,24 @@ def fetch_webpage_content(url: str, max_chars: int = 8000) -> dict | None:
     if url == "direct_answer":
         return None
 
-    headers = { # 好奇怪
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/120.0.0.0 Safari/537.36"
-        )
+    # headers = { # 好奇怪
+    #     "User-Agent": (
+    #         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    #         "AppleWebKit/537.36 (KHTML, like Gecko) "
+    #         "Chrome/120.0.0.0 Safari/537.36"
+    #     )
+    # }
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive",
+        "Referer": "https://www.google.com/", # 伪装是从搜索引擎跳转过来的
     }
     try:
         resp = requests.get(url, headers=headers, timeout=10)
+        print(f"web_utils.py里面的 fetch_webpage_content里面的 resp：{resp}")
         if resp.status_code != 200:
             warnings.warn(f"抓取失败 status={resp.status_code} url={url}")
             return None

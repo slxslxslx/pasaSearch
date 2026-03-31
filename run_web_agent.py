@@ -10,16 +10,16 @@ from web_agent  import WebAgent
 from web_utils  import exact_match, contains_match
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--input_file",     type=str, default="/data/bamboogle_data.jsonl")
+parser.add_argument("--input_file",     type=str, default="data/bamboogle_data.jsonl")
 parser.add_argument("--crawler_path",   type=str, default="/data1/llm/pasa/checkpoints/pasa-7b-crawler") # crawler 模型路径（或 API 模型名）"checkpoints/pasa-7b-crawler"
 parser.add_argument("--selector_path",  type=str, default="/data1/llm/pasa/checkpoints/pasa-7b-selector")
 parser.add_argument("--output_folder",  type=str, default="results/bamboogle")
 parser.add_argument("--prompts_path",   type=str, default="web_agent_prompt.json")
 parser.add_argument("--expand_layers",  type=int, default=2)
-parser.add_argument("--search_queries", type=int, default=5) # 初始子查询数量
-parser.add_argument("--search_papers",  type=int, default=10) # 每个查询搜索的页面数
-parser.add_argument("--expand_papers",  type=int, default=20) # 每层最多展开的页面数
-parser.add_argument("--threads_num",    type=int, default=20)
+parser.add_argument("--search_queries", type=int, default=2) # 初始子查询数量 5
+parser.add_argument("--search_papers",  type=int, default=2) # 每个查询搜索的页面数 10
+parser.add_argument("--expand_papers",  type=int, default=2) # 每层最多展开的页面数 20
+parser.add_argument("--threads_num",    type=int, default=1) # 20
 parser.add_argument("--match_mode",     type=str, default="contains", choices=["exact", "contains"]) # exact=严格匹配；contains=答案是预测的子串（推荐）
 args = parser.parse_args()
 
