@@ -7,6 +7,7 @@ import json
 import warnings
 import requests
 from bs4 import BeautifulSoup
+from requests.exceptions import RequestException
 
 # ============================================================
 # 配置：在这里填入你的 Serper API Key
@@ -54,6 +55,7 @@ def google_search_web(query: str, num: int = 10) -> list[dict]:
                         "title":   answer_box.get("title", "Answer Box"),
                         "snippet": answer_box.get("answer", answer_box.get("snippet", "")),
                     })
+                print(f"web_utils.py里面的 google_search_web()的 最后返回results[:num]：{results[:num]}")
                 return results[:num]
         except Exception as e:
             warnings.warn(f"Serper 搜索失败（第{attempt+1}次），query={query}，错误={e}")
@@ -66,13 +68,19 @@ def google_search_web(query: str, num: int = 10) -> list[dict]:
 #    返回格式：{"<段落标题或序号>": "<正文文本>", ...}
 #    失败时返回 None
 # ============================================================
-def fetch_webpage_content(url: str, max_chars: int = 8000) -> dict | None:
+def fetch_webpage_content(url: str, max_chars: int = 8000) -> dict | None: # 通过 requests + BeautifulSoup 抓取网页 → 清洗噪声 → 定位正文主容器 → 按照“标题 + 段落”结构切分成字典
     """
     抓取网页，提取正文段落，返回 {section_title: text} 字典。
     max_chars：每个页面保留的最大字符数，避免 prompt 过长。
     """
     if url == "direct_answer":
         return None
+    
+    # === 关键：设置 SOCKS5 代理（走你的 1824 端口）===
+    proxies = {
+        "http": "socks5h://127.0.0.1:1824",
+        "https": "socks5h://127.0.0.1:1824"
+    }
 
     # headers = { # 好奇怪
     #     "User-Agent": (
@@ -90,20 +98,20 @@ def fetch_webpage_content(url: str, max_chars: int = 8000) -> dict | None:
         "Referer": "https://www.google.com/", # 伪装是从搜索引擎跳转过来的
     }
     try:
-        resp = requests.get(url, headers=headers, timeout=10)
+        resp = requests.get(url, headers=headers, timeout=50,proxies=proxies,allow_redirects=True)
         print(f"web_utils.py里面的 fetch_webpage_content里面的 resp：{resp}")
         if resp.status_code != 200:
-            warnings.warn(f"抓取失败 status={resp.status_code} url={url}")
+            warnings.warn(f"抓取失败：fetch_webpage_content resp.status_code != 200 status={resp.status_code} url={url}")
             return None
 
-        soup = BeautifulSoup(resp.text, "html.parser")
+        soup = BeautifulSoup(resp.text, "html.parser") # 解析成dom树
 
-        # 移除脚本/样式/导航等噪声标签
+        # 暴力删除所有噪声标签（脚本、样式、导航、页眉页脚等）
         for tag in soup(["script", "style", "nav", "header", "footer",
                           "aside", "form", "noscript", "iframe"]):
             tag.decompose()
 
-        # 尝试找主正文容器（article / main / div#content 等）
+        # 尝试找到正文主容器（优先级从高到低）
         main = (
             soup.find("article") or
             soup.find("main") or
@@ -111,35 +119,36 @@ def fetch_webpage_content(url: str, max_chars: int = 8000) -> dict | None:
             soup.find("div", {"class": re.compile(r"content|main|article|post", re.I)}) or
             soup.body
         )
+        print(f"wen_utils.py里面的 fetch_webpage_content()里面的 main:{main}")
         if main is None:
             return None
 
         # 按段落 / 标题切分成小节
-        sections = {}
-        current_title = "intro"
-        current_text = []
+        sections = {} # # 最终要返回的字典：{标题: 正文}
+        current_title = "intro" # # 当前正在收集的章节标题，初始是“引言”？？？？？？？？？？
+        current_text = [] # # 当前章节正在累积的段落列表
 
-        for elem in main.descendants:
-            if not hasattr(elem, "name"):
+        for elem in main.descendants: # BeautifulSoup 提供的生成器，它会按照文档顺序（depth-first, document order） 遍历 main 标签下的所有后代节点（包括子节点、孙节点……一直到最深层的文本节点）。相当于把整个正文区域“从上到下、从左到右”线性扫一遍，不会漏掉嵌套的结构。
+            if not hasattr(elem, "name"): # 这里直接跳过所有纯文本节点，只处理标签节点
                 continue
-            if elem.name in ("h1", "h2", "h3", "h4"):
+            if elem.name in ("h1", "h2", "h3", "h4"): # 遇到一级到四级标题时，就认为“新的一节开始了”。
                 # 保存上一节
                 text = " ".join(current_text).strip()
                 if text:
                     sections[current_title] = text[:2000]  # 每节最多2000字
                 current_title = elem.get_text(strip=True)[:80]
                 current_text = []
-            elif elem.name == "p":
-                t = elem.get_text(strip=True)
+            elif elem.name == "p": # 遇到 <p> 标签时，才认为是正文段落。
+                t = elem.get_text(strip=True) # 会把标签内所有文本提取出来，并自动去除首尾空格、换行等。
                 if len(t) > 20:  # 过滤太短的碎片
                     current_text.append(t)
 
-        # 保存最后一节
+        # 保存最后一节。如果页面最后一段没有被标题打断（最常见情况），循环结束后 current_text 里还有内容，必须手动保存一次。
         text = " ".join(current_text).strip()
         if text:
             sections[current_title] = text[:2000]
 
-        if not sections:
+        if not sections: # 有些极简/古怪页面可能没有 <h1>~<h4> 和 <p>（比如全是 <div>），这时就退化为“把整个正文区打平”作为 fallback。
             # fallback：直接取全文
             full_text = main.get_text(separator=" ", strip=True)
             full_text = re.sub(r"\s+", " ", full_text)[:max_chars]
@@ -148,8 +157,11 @@ def fetch_webpage_content(url: str, max_chars: int = 8000) -> dict | None:
 
         return sections if sections else None
 
+    except RequestException as e:   # 更精确捕获网络异常
+        warnings.warn(f"fetch_webpage_content 抓取异常 url={url}，错误={e}")
+        return None
     except Exception as e:
-        warnings.warn(f"抓取网页异常 url={url}，错误={e}")
+        warnings.warn(f"fetch_webpage_content except 抓取网页异常 url={url}，错误={e}")
         return None
 
 

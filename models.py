@@ -66,10 +66,11 @@ class Agent:
         )
         generated_ids = [
             output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
-        ]
+        ] # generated_ids = tensor([[151644,   8948,    198,   2610,    525,    458,  20685,  31085,    304,279,
 
         response = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
-        return response
+        return response 
+        # '[Search]Citibank foundation year[Search]president of the United States in 1812[StopSearch]'
     
     def batch_infer(self, prompts, batch_size=8, sample=False):
         if len(prompts) == 0:

@@ -17,7 +17,7 @@ parser.add_argument("--output_folder",  type=str, default="results/bamboogle")
 parser.add_argument("--prompts_path",   type=str, default="web_agent_prompt.json")
 parser.add_argument("--expand_layers",  type=int, default=2)
 parser.add_argument("--search_queries", type=int, default=2) # 初始子查询数量 5
-parser.add_argument("--search_papers",  type=int, default=2) # 每个查询搜索的页面数 10
+parser.add_argument("--search_papers",  type=int, default=10) # 每个查询搜索的页面数 10
 parser.add_argument("--expand_papers",  type=int, default=2) # 每层最多展开的页面数 20
 parser.add_argument("--threads_num",    type=int, default=1) # 20
 parser.add_argument("--match_mode",     type=str, default="contains", choices=["exact", "contains"]) # exact=严格匹配；contains=答案是预测的子串（推荐）
@@ -46,10 +46,11 @@ with open(args.input_file) as f:
 
 for idx, line in enumerate(lines):
     data = json.loads(line)
+    id = data["id"]
     question   = data["question"]
     gold_answer = data.get("answer", "")
 
-    print(f"\n[{idx+1}/{len(lines)}] Q: {question}")
+    print(f"\n[{id+1}/{len(lines)}] Q: {question}")
     print(f"  Gold: {gold_answer}")
 
     # 构建 WebAgent（和 PASA 的 PaperAgent 接口完全一样）
@@ -78,10 +79,10 @@ for idx, line in enumerate(lines):
     print(f"  {'✓' if is_correct else '✗'}  Running Acc: {correct}/{total} = {acc:.4f}")
 
     # 保存单条结果
-    result_path = os.path.join(args.output_folder, f"{idx}.json")
+    result_path = os.path.join(args.output_folder, f"{id}.json")
     json.dump(
         {
-            "id":           data.get("id", idx),
+            "id":           data.get("id", id),
             "question":     question,
             "gold_answer":  gold_answer,
             "pred_answer":  pred_answer,
@@ -89,14 +90,14 @@ for idx, line in enumerate(lines):
             "search_tree":  agent.root.todic(),
         },
         open(result_path, "w"),
-        indent=2,
+        indent=2,  # 每一层嵌套缩进 2 个空格
         ensure_ascii=False,
     )
 
     # 实时追加到 summary
     with open(summary_path, "a") as sf:
         sf.write(json.dumps({
-            "id":          data.get("id", idx),
+            "id":          data.get("id", id),
             "question":    question,
             "gold_answer": gold_answer,
             "pred_answer": pred_answer,

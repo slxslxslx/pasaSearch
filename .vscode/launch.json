@@ -1,0 +1,49 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run PasaSearch",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "run_web_agent.py",
+            "console": "integratedTerminal",
+            "python": "/home/shaolingxuan/miniconda3/envs/pasaSearch/bin/python",
+            "args": [
+                "--input_file",                "data/bamboogle_data.jsonl",
+                "--crawler_path",                "/data1/llm/pasa/checkpoints/pasa-7b-crawler",
+                "--selector_path",                "/data1/llm/pasa/checkpoints/pasa-7b-selector",
+                "--output_folder",                "results/bamboogle",
+                "--expand_layers",                "2",
+                "--search_queries",                "5",
+                "--search_papers",                "10",
+                "--expand_papers",                "2",
+                "--threads_num",                "1"
+            ],
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "2,3", 
+                "CUDA_MPS_LOG_DIRECTORY": "/tmp/mps_slx_log_0", 
+                "CUDA_MPS_PIPE_DIRECTORY": "/tmp/mps_slx_0", 
+                "PYTHONUNBUFFERED": "1" 
+            },
+        },
+        {
+            "name": "Run PasaSearch + Log",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "run_web_agent.py",
+            "console": "integratedTerminal",
+            "python": "/home/shaolingxuan/miniconda3/envs/pasaSearch/bin/python",
+            "preLaunchTask": "run_with_log",        // ←←← 关键这一行
+            "args": [],                             // 这里清空或不写 args
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "2,3",
+                "CUDA_MPS_LOG_DIRECTORY": "/tmp/mps_slx_log_0",
+                "CUDA_MPS_PIPE_DIRECTORY": "/tmp/mps_slx_0",
+                "PYTHONUNBUFFERED": "1"
+            }
+        }
+    ]
+}

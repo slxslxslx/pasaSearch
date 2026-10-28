@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "run_with_log",
+            "type": "shell",
+            "command": "python",
+            // "args": [
+            //     "run_web_agent.py",
+            //     "--input_file", "data/bamboogle_data.jsonl",
+            //     "--crawler_path", "/data1/llm/pasa/checkpoints/pasa-7b-crawler",
+            //     "--selector_path", "/data1/llm/pasa/checkpoints/pasa-7b-selector",
+            //     "--output_folder", "results/bamboogle",
+            //     "--expand_layers", "2",
+            //     "--search_queries", "2",
+            //     "--search_papers", "2",
+            //     "--expand_papers", "2",
+            //     "--threads_num", "1"
+            // ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false
+            },
+            // 关键：同时输出到终端 + 写入带时间戳的 log 文件
+            "args": [
+                "-c",
+                "python run_web_agent.py --input_file data/bamboogle_data.jsonl --crawler_path /data1/llm/pasa/checkpoints/pasa-7b-crawler --selector_path /data1/llm/pasa/checkpoints/pasa-7b-selector --output_folder results/bamboogle --expand_layers 2 --search_queries 2 --search_papers 2 --expand_papers 2 --threads_num 1 2>&1 | tee -a logs/pasa_run_$(date +%Y%m%d_%H%M%S).log"
+            ],
+        }
+    ]
+}

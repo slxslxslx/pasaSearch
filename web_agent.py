@@ -63,7 +63,7 @@ class WebAgent:
 
         # 正则模板（和 PASA 保持一致，改 prompt 里的占位符即可）
         self.templates = {
-            "search_template": r"Search\](.*?)\[",   # 从 crawler 输出里提取子查询
+            "search_template": r"Search\](.*?)\[",   # 从 crawler 输出里提取子查询 # Search]我是要提取的内容[
             "expand_template": r"Expand\](.*?)\[",   # 从 crawler 输出里提取要展开的章节
         }
 
@@ -94,9 +94,10 @@ class WebAgent:
                     return
                 query,self.root.child[query]  = queries.pop(),[]
 
-            search_results = google_search_web(query, self.search_papers)
+            search_results = google_search_web(query, self.search_papers) # List[Dict]
+            print(f"web_agent.py里面的  _search_one_query()里面的    search_results：{search_results}")
             page_objects   = [build_page_object(r) for r in search_results] # 这里的r是什么 # page_objects ~~ searched_papers
-            print(f"web_agent里面的page_objects：{page_objects}") # web_agent里面的page_objects：[{'page_id': 'https://en.wikipedia.org/wiki/Citibank', 'title': 'Citibank - Wikipedia', 'abstract': 'Citibank was founded in 1812 as City Bank of New York, and later became First National City Bank of New York.', 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://www.citigroup.com/global/about-us/heritage/1812/new-bank-born-in-new-york', 'title': 'A new bank born in New York - Citi', 'abstract': '... U.S. President James Madison applied to set up a new bank. Noting that it ... United States. Enter one Samuel Osgood, elder statesman. He had a plan ...', 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://en.wikipedia.org/wiki/Citigroup', 'title': 'Citigroup - Wikipedia', 'abstract': 'Citi established the first fully operational U.S. bank branch in Hanoi in 1994. Following the branch opening in Ho Chi Minh City in 1998, ...', 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://time.com/archive/6687482/citibank-teetering-since-1812/', 'title': 'Citibank: Teetering Since 1812 - TIME', 'abstract': "James Stillman, who became City's president in 1891, combined prudence with great ambition. City Bank cruised through the Panic of 1893, thanks ...", 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://www.businessinsider.com/presenting-a-history-of-citi-2012-4', 'title': "The Dramatic Highlights From Citi's 200-Year History", 'abstract': 'In 1891, James Stillman is elected president of the bank and helps lead America onto the world stage. James Stillman. Timeline. Stillman ...', 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://www.citigroup.com/rcs/citigpa/storage/public/Citi%20Historic%20Records%20Review%20Summary.pdf', 'title': '[PDF] Citi Historic Records Review Summary The history of Citigroup Inc ...', 'abstract': 'Between 1837 and 1882, Moses Taylor was a director, controlling shareholder, and. President (1856-1882) of City Bank of New York. Taylor was also a director of ...', 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://portersfiveforce.com/blogs/brief-history/citigroup', 'title': "What is Brief History of Citi Company? - Porter's Five Forces", 'abstract': 'Chartered on June 16, 1812; operations began September 14, 1812 · First president: Samuel Osgood, former U.S. Postmaster General and ...', 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://www.streetofwalls.com/articles/investment-banking/learn-the-basics/citigroup/', 'title': 'Citigroup Profile | Street Of Walls', 'abstract': 'Beginning as the City Bank of New York, and later being renamed to Citibank in 1812, it became Bank Handlowy in 1870, Smith Barney in 1873, Banamex in 1884, ...', 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://www.youtube.com/watch?v=ah0V2gCDa80', 'title': "From 1812 Origins to One of America's Largest Banks - YouTube", 'abstract': 'How did Citibank grow from a small bank founded in 1812 in New York City into one of the largest financial institutions in the United States ...', 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://pestel-analysis.com/blogs/owners/citigroup', 'title': 'Who Owns Citi Company? - PESTEL Analysis', 'abstract': 'Founding (1812), City Bank of New York chartered by New York merchants with Samuel Osgood as first President. Initial capital: $2 million. ; Post ...', 'sections': {}, 'source': 'SearchFrom:web'}]
+            print(f"web_agent里面的  _search_one_query()里面的  page_objects：{page_objects}") # web_agent里面的page_objects：[{'page_id': 'https://en.wikipedia.org/wiki/Citibank', 'title': 'Citibank - Wikipedia', 'abstract': 'Citibank was founded in 1812 as City Bank of New York, and later became First National City Bank of New York.', 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://www.citigroup.com/global/about-us/heritage/1812/new-bank-born-in-new-york', 'title': 'A new bank born in New York - Citi', 'abstract': '... U.S. President James Madison applied to set up a new bank. Noting that it ... United States. Enter one Samuel Osgood, elder statesman. He had a plan ...', 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://en.wikipedia.org/wiki/Citigroup', 'title': 'Citigroup - Wikipedia', 'abstract': 'Citi established the first fully operational U.S. bank branch in Hanoi in 1994. Following the branch opening in Ho Chi Minh City in 1998, ...', 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://time.com/archive/6687482/citibank-teetering-since-1812/', 'title': 'Citibank: Teetering Since 1812 - TIME', 'abstract': "James Stillman, who became City's president in 1891, combined prudence with great ambition. City Bank cruised through the Panic of 1893, thanks ...", 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://www.businessinsider.com/presenting-a-history-of-citi-2012-4', 'title': "The Dramatic Highlights From Citi's 200-Year History", 'abstract': 'In 1891, James Stillman is elected president of the bank and helps lead America onto the world stage. James Stillman. Timeline. Stillman ...', 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://www.citigroup.com/rcs/citigpa/storage/public/Citi%20Historic%20Records%20Review%20Summary.pdf', 'title': '[PDF] Citi Historic Records Review Summary The history of Citigroup Inc ...', 'abstract': 'Between 1837 and 1882, Moses Taylor was a director, controlling shareholder, and. President (1856-1882) of City Bank of New York. Taylor was also a director of ...', 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://portersfiveforce.com/blogs/brief-history/citigroup', 'title': "What is Brief History of Citi Company? - Porter's Five Forces", 'abstract': 'Chartered on June 16, 1812; operations began September 14, 1812 · First president: Samuel Osgood, former U.S. Postmaster General and ...', 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://www.streetofwalls.com/articles/investment-banking/learn-the-basics/citigroup/', 'title': 'Citigroup Profile | Street Of Walls', 'abstract': 'Beginning as the City Bank of New York, and later being renamed to Citibank in 1812, it became Bank Handlowy in 1870, Smith Barney in 1873, Banamex in 1884, ...', 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://www.youtube.com/watch?v=ah0V2gCDa80', 'title': "From 1812 Origins to One of America's Largest Banks - YouTube", 'abstract': 'How did Citibank grow from a small bank founded in 1812 in New York City into one of the largest financial institutions in the United States ...', 'sections': {}, 'source': 'SearchFrom:web'}, {'page_id': 'https://pestel-analysis.com/blogs/owners/citigroup', 'title': 'Who Owns Citi Company? - PESTEL Analysis', 'abstract': 'Founding (1812), City Bank of New York chartered by New York merchants with Samuel Osgood as first President. Initial capital: $2 million. ; Post ...', 'sections': {}, 'source': 'SearchFrom:web'}]
 
             # 用 selector 对每个页面的 snippet 打相关分
             select_prompts = [
@@ -107,6 +108,7 @@ class WebAgent:
                 )
                 for p in page_objects
             ]
+            print(f"web_agent里面的 _search_one_query()里面的 select_prompts：{select_prompts}")
             scores = self.selector.infer_score(select_prompts)
 
             with self.lock:
@@ -137,17 +139,20 @@ class WebAgent:
     def search(self):
         """生成子查询，并行搜索"""
         prompt  = self.prompts["generate_query"].format(user_query=self.user_query).strip()
-        raw_out = self.crawler.infer(prompt)
+        print(f"web_agent.py里面的 search()  prompt：{prompt}")
+        raw_out = self.crawler.infer(prompt) # '[Search]Citibank foundation year[Search]president of the United States in 1812[StopSearch]'
+        print(f"web_agent.py里面的 search()  raw_out：{raw_out}")
         queries = [
             q.strip()
             for q in re.findall(self.templates["search_template"], raw_out, flags=re.DOTALL)
-        ][:self.search_queries]
+        ][:self.search_queries] # queries = ['Citibank foundation year', 'president of the United States in 1812']
 
-        if not queries:
+        if not queries: 
             # fallback：直接用原始问题搜索
             queries = [self.user_query]
 
-        WebAgent.do_parallel(self._search_one_query, (queries,), len(queries))
+        # WebAgent.do_parallel(self._search_one_query, (queries,), len(queries))
+        WebAgent.do_parallel(self._search_one_query, (queries,), 1)
 
     # ------------------------------------------------------------------
     # STEP 2 : expand（多层展开）
@@ -177,7 +182,7 @@ class WebAgent:
                 user_query = self.user_query,
                 title      = page.title,
                 abstract   = page.abstract,
-                sections   = list(page.sections.keys()),
+                sections   = list(page.sections.keys()),# ！！！！！！！！！！
             ).strip()
             with self.lock:
                 have_full_pages.append(page)
@@ -197,15 +202,22 @@ class WebAgent:
 
             # 解析 crawler 选择的章节
             chosen_sections = re.findall(self.templates["expand_template"], crawl_result, flags=re.DOTALL)
-            chosen_sections = [s.strip() for s in chosen_sections if s.strip() in page.sections] # 有何意义？？？
-            print(f"web_agent里面的 _do_expand里面的 chosen_sections：{chosen_sections}")
-            print(f"web_agent里面的 _do_expand里面的 page.sections：{page.sections}") # 什么数据结构，怎么就是字典了？？
+            chosen_sections = [s.strip() for s in chosen_sections if s.strip() in page.sections] # 有何意义？？？不是瞎编的
+            # 这里的chosen_sections不是全局累计信息，只是当前这一个页面的内容！！！！！！！
+
+            print(f"web_agent里面的 _do_expand里面的 chosen_sections：{chosen_sections}") # ['intro'] #或者['Voyager 2']
+            print(f"web_agent里面的 _do_expand里面的 page.sections：{page.sections}") #字典，小标题：内容
+            # web_agent里面的 _do_expand里面的 chosen_sections：['intro']
+            # web_agent里面的 _do_expand里面的 page.sections：{'intro': 'Citigroup Inc. became one of the worldâ\x80\x99s biggest banking corporations following Citicorpâ\x80\x99s $140 billion merger with Travelers Group in 1998.Â\xa0 Headquartered in Manhattan, Citigroup is one of the largest global financial services corporations with 260,000 full-time employees and 16,000 offices in 140 countries. The history of Citigroup has involved absorption, mergers and acquisitions of other companies, which has thus caused it to have many different names throughout the decades.Â\xa0 Beginning as the City Bank of New York, and later being renamed to Citibank in 1812, it became Bank Handlowy in 1870, Smith Barney in 1873, Banamex in 1884, Salomon Brothers in 1910, before becoming Citicorp. With its services in credit cards, consumer banking, corporate banking, investment banking, global wealth management, financial analysis, and private equity, Citigroup now holds over 200 million customer accounts as the 24thlargest banking corporation. Company Controversies: After suffering enormous economic loss during the financial crisis in 2008 as the largest financial institution worldwide, Citigroup was given the largest stimulus package by the U.S. government to date in 2009.Â\xa0 The deal called for the government to take a 36% majority share in Citigroup by using $25 billion to purchase its stocks, extend a $45 billion credit line so that the company could avoid bankruptcy, take on the debt for over $300 billion in bad assets, and lend it $20 billion to cover any other losses.Â\xa0 Â\xa0Citigroupâ\x80\x99s CEOâ\x80\x99s annual salary was set to be $1, and no executive could earn over $500,000 without penalty until the $25 billion dollars was repaid. The rationale behind this was that the government prevented a massive domino effect and potential collapse of the financial market.Â\xa0 The government relies on the stock market and continued investment in it for its Global Transactions Services division that floats nearly $3 trillion worldwide on a daily basis to multinational corporations, govern'}
+            # web_agent里面的 _do_expand里面的 chosen_sections：['A new bank born in New York']
+            # web_agent里面的 _do_expand里面的 page.sections：{'A new bank born in New York': 'In 1811, a group of merchants takes the first steps towards setting up a new bank to help New York compete with rivals Philadelphia, Boston, and Baltimore.'}
+
 
             if not chosen_sections:
                 page.extra["expand"] = "no section chosen"
                 continue
 
-            # 把选中章节的文本拼起来，生成展开子查询
+            # 把选中章节的文本拼起来，生成展开子查询。只是拼接，不需要总结？？
             context_text = "\n\n".join(
                 f"[{sec}]\n{page.sections[sec]}" for sec in chosen_sections
             )
@@ -275,7 +287,7 @@ class WebAgent:
 
         crawl_prompts, have_full_pages = [], []
         WebAgent.do_parallel(self._get_page_content,(new_pages, crawl_prompts, have_full_pages),self.threads_num)
-        crawl_results = self.crawler.batch_infer(crawl_prompts)
+        crawl_results = self.crawler.batch_infer(crawl_prompts) # crawl_results 是多个 pages 各自被选出的 section，一个 page 对应一条结果。# max_length=992,太短了 # crawl_prompts=["You are conducting research on `What rocket was the first spacecraft that ever approached Uranus launched on?`. You need to predict which sections to look at for finding the exact answer. Title: Exploration of Uranus - Wikipedia\nAbstract: The exploration of Uranus has, to date, been through telescopes and a lone probe by NASA's Voyager 2 spacecraft, which made its closest approach to Uranus ...\nSections: ['intro', 'Voyager 2', 'Proposed missions', 'External links']"]
         WebAgent.do_parallel(self._do_expand,(depth, have_full_pages, crawl_results),self.threads_num,)
 
     # ------------------------------------------------------------------
